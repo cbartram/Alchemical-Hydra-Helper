@@ -16,16 +16,7 @@ import com.hydra.overlay.AttackOverlay;
 import com.hydra.overlay.PrayerOverlay;
 import com.hydra.overlay.SceneOverlay;
 import lombok.Getter;
-import net.runelite.api.Actor;
-import net.runelite.api.ChatMessageType;
-import net.runelite.api.Client;
-import net.runelite.api.DynamicObject;
-import net.runelite.api.GameObject;
-import net.runelite.api.GameState;
-import net.runelite.api.NPC;
-import net.runelite.api.NpcID;
-import net.runelite.api.ObjectID;
-import net.runelite.api.Projectile;
+import net.runelite.api.*;
 import net.runelite.api.coords.LocalPoint;
 import net.runelite.api.events.AnimationChanged;
 import net.runelite.api.events.ChatMessage;
@@ -42,24 +33,17 @@ import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.ui.overlay.OverlayManager;
 
-// Bugs:
-// - lightning phase count till special doesn't show sprite
-// - no hp till phase change after 1st phase
-// - counter for enrage phase wrong & counter till poison in enrage doesn't show
-// - doesn't highlight lightning
-
 @Singleton
 @PluginDescriptor(
 	name = "Alchemical Hydra",
 	enabledByDefault = false,
-	description = "A plugin for the Alchemical Hydra boss.",
-	tags = {"alchemical", "hydra"}
+	description = "Tracks Prayers and specials for the Alchemical Hydra.",
+	tags = {"alchemical", "hydra", "alch", "boss", "pvm", "slayer"}
 )
 public class AlchemicalHydraPlugin extends Plugin
 {
 	private static final String MESSAGE_NEUTRALIZE = "The chemicals neutralise the Alchemical Hydra's defences!";
 	private static final String MESSAGE_STUN = "The Alchemical Hydra temporarily stuns you.";
-
 	private static final int[] HYDRA_REGIONS = {5279, 5280, 5535, 5536};
 
 	@Inject
@@ -100,6 +84,7 @@ public class AlchemicalHydraPlugin extends Plugin
 	@Getter
 	int fountainTicks = -1;
 	int lastFountainAnim = -1;
+	private boolean inCombat = false;
 
 	@Getter
 	private final Map<LocalPoint, Projectile> poisonProjectiles = new HashMap<>();
@@ -124,7 +109,9 @@ public class AlchemicalHydraPlugin extends Plugin
 	private void init() {
 		atHydra = true;
 
-		addOverlays();
+		overlayManager.add(sceneOverlay);
+		overlayManager.add(attackOverlay);
+		overlayManager.add(prayerOverlay);
 
 		for (final NPC npc : client.getNpcs()) {
 			onNpcSpawned(new NpcSpawned(npc));
@@ -135,7 +122,9 @@ public class AlchemicalHydraPlugin extends Plugin
 	protected void shutDown() {
 		atHydra = false;
 
-		removeOverlays();
+		overlayManager.remove(sceneOverlay);
+		overlayManager.remove(attackOverlay);
+		overlayManager.remove(prayerOverlay);
 
 		hydra = null;
 		poisonProjectiles.clear();
@@ -195,10 +184,51 @@ public class AlchemicalHydraPlugin extends Plugin
 	private void onGameTick(final GameTick event) {
 		attackOverlay.decrementStunTicks();
 		updateVentTicks();
+		if(hydra != null) {
 
-		System.out.println("Hydra Health till phase change: " + hydra.getHpUntilPhaseChange());
+			// If the player is in combat with the hydra
+			if(hydra.getHpUntilPhaseChange() == 270) {
+				inCombat = true;
+			}
+
+			// TODO This isn't a foolproof way of detecting phase changes. I've seen hydra have 2 hp left and change phases
+			// and the game state won't update until the player does > 2 damage. Probably something to do with the HP calculations
+			if (inCombat && hydra.getHpUntilPhaseChange() == 0) {
+				HydraPhase phase = hydra.getPhase();
+				switch (phase) {
+					case POISON:
+						System.out.println("Changing phase to: LIGHTNING.");
+						hydra.changePhase(HydraPhase.LIGHTNING);
+						break;
+					case LIGHTNING:
+						System.out.println("Changing phase to: FLAME.");
+						hydra.changePhase(HydraPhase.FLAME);
+						break;
+					case FLAME:
+						System.out.println("Changing phase to: ENRAGE.");
+						hydra.changePhase(HydraPhase.ENRAGED);
+						break;
+					case ENRAGED:
+						System.out.println("In enrage phase.");
+						// NpcDespawned event does not fire for Hydra inbetween kills; must use death animation.
+						hydra = null;
+
+						if (!poisonProjectiles.isEmpty()) {
+							poisonProjectiles.clear();
+						}
+						break;
+				}
+			}
+
+			if (!poisonProjectiles.isEmpty()) {
+				poisonProjectiles.values().removeIf(p -> p.getEndCycle() < client.getGameCycle());
+			}
+		}
 	}
 
+	/**
+	 * Updates the ticks remaining until the fountain spurts water again weakening the Alchemical Hydra.
+	 */
 	private void updateVentTicks() {
 		if (fountainTicks > 0) {
 			fountainTicks--;
@@ -209,21 +239,18 @@ public class AlchemicalHydraPlugin extends Plugin
 
 		if (!vents.isEmpty()) {
 			for (final GameObject vent : vents) {
-				int animation = getAnimation(vent);
+				final DynamicObject dynamicObject = (DynamicObject) vent.getRenderable();
+				int animation = dynamicObject.getAnimation().getId();
 				if (animation == 8279 && lastFountainAnim == 8280) {
 					fountainTicks = 2;
 				}
 				lastFountainAnim = animation;
-				break; // all vents trigger at same time so dont bother going through them all
+				break;
 			}
 		}
 
 	}
 
-	int getAnimation(GameObject gameObject) {
-		final DynamicObject dynamicObject = (DynamicObject) gameObject.getRenderable();
-		return dynamicObject.getAnimation().getId();
-	}
 
 	@Subscribe
 	private void onNpcSpawned(final NpcSpawned event) {
@@ -234,56 +261,6 @@ public class AlchemicalHydraPlugin extends Plugin
 			if (client.isInInstancedRegion() && fountainTicks == -1) {
 				fountainTicks = 11;
 			}
-		}
-	}
-
-	@Subscribe
-	private void onAnimationChanged(final AnimationChanged event) {
-		final Actor actor = event.getActor();
-
-		if (hydra == null || actor != hydra.getNpc()) {
-			return;
-		}
-
-		final HydraPhase phase = hydra.getPhase();
-
-		final int animationId = actor.getAnimation();
-
-		System.out.println("Anim changed.");
-		if ((animationId == phase.getDeathAnimation2() && phase != HydraPhase.FLAME) || (animationId == phase.getDeathAnimation1() && phase == HydraPhase.FLAME)) {
-			switch (phase) {
-				case POISON:
-					System.out.println("Changing phase to: LIGHTNING.");
-					hydra.changePhase(HydraPhase.LIGHTNING);
-					break;
-				case LIGHTNING:
-					System.out.println("Changing phase to: FLAME.");
-					hydra.changePhase(HydraPhase.FLAME);
-					break;
-				case FLAME:
-					System.out.println("Changing phase to: ENRAGE.");
-					hydra.changePhase(HydraPhase.ENRAGED);
-					break;
-				case ENRAGED:
-					System.out.println("In enrage phase.");
-					// NpcDespawned event does not fire for Hydra inbetween kills; must use death animation.
-					hydra = null;
-
-					if (!poisonProjectiles.isEmpty()) {
-						poisonProjectiles.clear();
-					}
-					break;
-			}
-
-			return;
-		}
-		else if (animationId == phase.getSpecialAnimationId() && phase.getSpecialAnimationId() != 0) {
-			System.out.println("Setting next special attack to 9 more auto's");
-			hydra.setNextSpecial();
-		}
-
-		if (!poisonProjectiles.isEmpty()) {
-			poisonProjectiles.values().removeIf(p -> p.getEndCycle() < client.getGameCycle());
 		}
 	}
 
@@ -330,18 +307,10 @@ public class AlchemicalHydraPlugin extends Plugin
 		}
 	}
 
-	private void addOverlays() {
-		overlayManager.add(sceneOverlay);
-		overlayManager.add(attackOverlay);
-		overlayManager.add(prayerOverlay);
-	}
-
-	private void removeOverlays() {
-		overlayManager.remove(sceneOverlay);
-		overlayManager.remove(attackOverlay);
-		overlayManager.remove(prayerOverlay);
-	}
-
+	/**
+	 * Determines if the player is within the Alchemical Hydra Instance
+	 * @return Returns true if the player is in the hydra instance and false otherwise.
+	 */
 	private boolean isInHydraRegion() {
 		return client.isInInstancedRegion() && Arrays.equals(client.getMapRegions(), HYDRA_REGIONS);
 	}

@@ -24,7 +24,6 @@ import net.runelite.client.game.SpriteManager;
 import net.runelite.client.ui.overlay.Overlay;
 import net.runelite.client.ui.overlay.OverlayLayer;
 import net.runelite.client.ui.overlay.OverlayPosition;
-import net.runelite.client.ui.overlay.OverlayPriority;
 import static net.runelite.client.ui.overlay.components.ComponentConstants.STANDARD_BACKGROUND_COLOR;
 import net.runelite.client.ui.overlay.components.ComponentOrientation;
 import net.runelite.client.ui.overlay.components.InfoBoxComponent;
@@ -33,23 +32,17 @@ import net.runelite.client.ui.overlay.components.PanelComponent;
 import net.runelite.client.util.ImageUtil;
 
 @Singleton
-public class AttackOverlay extends Overlay
-{
+public class AttackOverlay extends Overlay {
 	public static final int IMAGE_SIZE = 36;
-
 	private static final String INFO_BOX_TEXT_PADDING = "        ";
 	private static final Dimension INFO_BOX_DIMENSION = new Dimension(40, 40);
-
 	private static final PanelComponent panelComponent = new PanelComponent();
-
 	private static final InfoBoxComponent stunComponent = new InfoBoxComponent();
 	private static final InfoBoxComponent phaseSpecialComponent = new InfoBoxComponent();
 	private static final InfoBoxComponent prayerComponent = new InfoBoxComponent();
-
 	private static final int STUN_TICK_DURATION = 7;
 
-	static
-	{
+	static {
 		panelComponent.setOrientation(ComponentOrientation.VERTICAL);
 		panelComponent.setBorder(new Rectangle(0, 0, 0, 0));
 		panelComponent.setPreferredSize(new Dimension(40, 0));
@@ -60,14 +53,10 @@ public class AttackOverlay extends Overlay
 	}
 
 	private final Client client;
-
 	private final AlchemicalHydraPlugin plugin;
 	private final AlchemicalHydraConfig config;
-
 	private final SpriteManager spriteManager;
-
 	private int stunTicks;
-
 	private Hydra hydra;
 
 	@Inject
@@ -78,7 +67,7 @@ public class AttackOverlay extends Overlay
 		this.spriteManager = spriteManager;
 
 		stunComponent.setBackgroundColor(config.dangerColor());
-		// stunComponent.setImage(createStunImage());
+		stunComponent.setImage(createStunImage());
 
 		setPosition(OverlayPosition.BOTTOM_RIGHT);
 		setLayer(OverlayLayer.UNDER_WIDGETS);
@@ -98,8 +87,7 @@ public class AttackOverlay extends Overlay
 
 		updatePhaseSpecialComponent();
 
-		if (config.hidePrayerOnSpecial() && isSpecialAttack())
-		{
+		if (config.hidePrayerOnSpecial() && isSpecialAttack()) {
 			return panelComponent.render(graphics2D);
 		}
 
@@ -110,6 +98,9 @@ public class AttackOverlay extends Overlay
 		return panelComponent.render(graphics2D);
 	}
 
+	/**
+	 * Reduces the count of ticks until your player becomes unstunned in the hydra's flame phase.
+	 */
 	public void decrementStunTicks() {
 		if (stunTicks > 0) {
 			--stunTicks;
@@ -135,7 +126,6 @@ public class AttackOverlay extends Overlay
 		}
 
 		stunComponent.setText(INFO_BOX_TEXT_PADDING + stunTicks);
-
 		panelComponent.getChildren().add(stunComponent);
 	}
 
@@ -160,17 +150,13 @@ public class AttackOverlay extends Overlay
 		panelComponent.getChildren().add(phaseSpecialComponent);
 	}
 
-	private void updatePrayerComponent()
-	{
+	private void updatePrayerComponent() {
 		final Prayer nextPrayer = hydra.getNextAttack().getPrayer();
 		final int nextSwitch = hydra.getNextSwitch();
 
-		if (nextSwitch == 1)
-		{
+		if (nextSwitch == 1) {
 			prayerComponent.setBackgroundColor(client.isPrayerActive(nextPrayer) ? config.warningColor() : config.dangerColor());
-		}
-		else
-		{
+		} else {
 			prayerComponent.setBackgroundColor(client.isPrayerActive(nextPrayer) ? config.safeColor() : config.dangerColor());
 		}
 
@@ -180,19 +166,16 @@ public class AttackOverlay extends Overlay
 		panelComponent.getChildren().add(prayerComponent);
 	}
 
-	private void renderPrayerWidget(final Graphics2D graphics2D)
-	{
+	private void renderPrayerWidget(final Graphics2D graphics2D) {
 		final Prayer prayer = hydra.getNextAttack().getPrayer();
 
 		OverlayUtil.renderPrayerOverlay(graphics2D, client, prayer, prayer == Prayer.PROTECT_FROM_MAGIC ? Color.CYAN : Color.GREEN);
 	}
 
-	private boolean isSpecialAttack()
-	{
+	private boolean isSpecialAttack() {
 		final HydraPhase phase = hydra.getPhase();
 
-		switch (phase)
-		{
+		switch (phase) {
 			case FLAME:
 				final NPC npc = hydra.getNpc();
 				return hydra.getNextSpecialRelative() == 0 || (npc != null && npc.getInteracting() == null);
@@ -205,8 +188,7 @@ public class AttackOverlay extends Overlay
 		return false;
 	}
 
-	private BufferedImage createStunImage()
-	{
+	private BufferedImage createStunImage() {
 		final SpritePixels root = getSprite(SpriteID.SPELL_ENTANGLE);
 		final SpritePixels mark = getSprite(SpriteID.TRADE_EXCLAMATION_MARK_ITEM_REMOVAL_WARNING);
 

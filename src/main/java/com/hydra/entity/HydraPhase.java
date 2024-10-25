@@ -18,8 +18,7 @@ import static com.hydra.AlchemicalHydraPlugin.*;
 
 @Getter
 @RequiredArgsConstructor
-public enum HydraPhase
-{
+public enum HydraPhase {
 
 	POISON(3, HYDRA_1_1, HYDRA_1_2, 1644, 0, 825, SpriteID.SPELL_CLAWS_OF_GUTHIX, new WorldPoint(1371, 10263, 0), Color.GREEN, Color.RED),
 	LIGHTNING(3, HYDRA_2_1, HYDRA_2_2, 0, HYDRA_LIGHTNING, 550, SpriteID.SPELL_ENERGY_TRANSFER, new WorldPoint(1371, 10272, 0), Color.CYAN, Color.GREEN),
@@ -43,6 +42,11 @@ public enum HydraPhase
 
 	private BufferedImage specialImage;
 
+	/**
+	 * Returns a resized version of a sprite image.
+	 * @param spriteManager RuneLite sprite manager which handles finding and loading game sprites.
+	 * @return BufferedImage the resized sprite image.
+	 */
 	public BufferedImage getSpecialImage(final SpriteManager spriteManager) {
 		if (specialImage == null) {
 			final BufferedImage tmp = spriteManager.getSprite(spriteId, 0);
