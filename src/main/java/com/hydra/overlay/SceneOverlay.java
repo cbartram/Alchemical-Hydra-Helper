@@ -1,12 +1,6 @@
 package com.hydra.overlay;
 
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Graphics2D;
-import java.awt.Polygon;
-import java.awt.Shape;
-import java.awt.Stroke;
+import java.awt.*;
 import java.awt.geom.Area;
 import java.util.Collection;
 import java.util.Map;
@@ -257,12 +251,12 @@ public class SceneOverlay extends Overlay {
 			OverlayUtil.renderTextLocation(
 				graphics2D,
 				text,
-				config.fountainTicksFontSize(),
-				config.fountainTicksFontStyle().getFont(),
-				config.fountainTicksFontColor(),
+				16,
+				Font.BOLD,
+				new Color(255, 255, 255, 255),
 				timeLoc,
-				config.fountainTicksFontShadow(),
-				config.fountainTicksFontZOffset() * -1
+				true,
+				0
 			);
 		}
 
@@ -293,12 +287,12 @@ public class SceneOverlay extends Overlay {
 		OverlayUtil.renderTextLocation(
 			graphics2D,
 			text,
-			config.fontSize(),
-			config.fontStyle().getFont(),
-			config.fontColor(),
+			16,
+			Font.BOLD,
+			new Color(255, 255, 255, 255),
 			point,
-			config.fontShadow(),
-			config.fontZOffset() * -1
+			true,
+			0
 		);
 	}
 

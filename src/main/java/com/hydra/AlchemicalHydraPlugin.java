@@ -2,11 +2,8 @@
 package com.hydra;
 
 import com.google.inject.Provides;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+
+import java.util.*;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
@@ -18,17 +15,11 @@ import com.hydra.overlay.SceneOverlay;
 import lombok.Getter;
 import net.runelite.api.*;
 import net.runelite.api.coords.LocalPoint;
-import net.runelite.api.events.AnimationChanged;
-import net.runelite.api.events.ChatMessage;
-import net.runelite.api.events.GameObjectDespawned;
-import net.runelite.api.events.GameObjectSpawned;
-import net.runelite.api.events.GameStateChanged;
-import net.runelite.api.events.GameTick;
-import net.runelite.api.events.NpcSpawned;
-import net.runelite.api.events.ProjectileMoved;
+import net.runelite.api.events.*;
 import net.runelite.client.callback.ClientThread;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
+import net.runelite.client.events.ConfigChanged;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.ui.overlay.OverlayManager;
@@ -209,10 +200,7 @@ public class AlchemicalHydraPlugin extends Plugin
 						hydra.changePhase(HydraPhase.ENRAGED);
 						break;
 					case ENRAGED:
-						System.out.println("In enrage phase.");
-						// NpcDespawned event does not fire for Hydra inbetween kills; must use death animation.
 						hydra = null;
-
 						if (!poisonProjectiles.isEmpty()) {
 							poisonProjectiles.clear();
 						}
@@ -225,6 +213,7 @@ public class AlchemicalHydraPlugin extends Plugin
 			}
 		}
 	}
+
 
 	/**
 	 * Updates the ticks remaining until the fountain spurts water again weakening the Alchemical Hydra.
@@ -257,9 +246,29 @@ public class AlchemicalHydraPlugin extends Plugin
 		final NPC npc = event.getNpc();
 
 		if (npc.getId() == NpcID.ALCHEMICAL_HYDRA) {
+			System.out.println("A new hydra has spawned.");
 			hydra = new Hydra(npc);
 			if (client.isInInstancedRegion() && fountainTicks == -1) {
 				fountainTicks = 11;
+			}
+		}
+	}
+
+	@Subscribe
+	private void onNpcDespawned(final NpcDespawned event) {
+		final NPC npc = event.getNpc();
+
+		if(npc != null) {
+			System.out.println("NPC Despawn event detected for: " + npc.getName());
+			if (Objects.equals(npc.getName(), "Alchemical Hydra")) {
+				System.out.println("Alchemical hydra has been killed. Re-setting plugin state.");
+				hydra = null;
+				poisonProjectiles.clear();
+				lastAttackTick = -1;
+				fountainTicks = -1;
+				vents.clear();
+				lastFountainAnim = -1;
+				inCombat = false;
 			}
 		}
 	}
@@ -278,7 +287,6 @@ public class AlchemicalHydraPlugin extends Plugin
 
 		if (hydra.getPhase().getSpecialProjectileId() == projectileId) {
 			if (hydra.getAttackCount() >= hydra.getNextSpecial()) {
-				System.out.println("Setting next special count to +9 since the attack count >= the next special.");
 				hydra.setNextSpecial();
 			}
 
@@ -301,7 +309,11 @@ public class AlchemicalHydraPlugin extends Plugin
 		final String message = event.getMessage();
 
 		if (message.equals(MESSAGE_NEUTRALIZE)) {
-			clientThread.invokeLater(() -> hydra.setImmunity(false));
+			clientThread.invokeLater(() -> {
+				if(hydra != null) {
+					hydra.setImmunity(false);
+				}
+			});
 		} else if (message.equals(MESSAGE_STUN)) {
 			attackOverlay.setStunTicks();
 		}

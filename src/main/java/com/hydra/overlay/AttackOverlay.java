@@ -67,7 +67,8 @@ public class AttackOverlay extends Overlay {
 		this.spriteManager = spriteManager;
 
 		stunComponent.setBackgroundColor(config.dangerColor());
-		stunComponent.setImage(createStunImage());
+		// TODO issue with this being called on a background thread...
+		// stunComponent.setImage(createStunImage());
 
 		setPosition(OverlayPosition.BOTTOM_RIGHT);
 		setLayer(OverlayLayer.UNDER_WIDGETS);

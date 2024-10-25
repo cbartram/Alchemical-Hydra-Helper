@@ -16,7 +16,6 @@ import net.runelite.client.config.Units;
 @ConfigGroup("alchemicalhydra")
 public interface AlchemicalHydraConfig extends Config {
 	// Sections
-
 	@ConfigSection(
 		name = "General",
 		description = "",
@@ -39,7 +38,6 @@ public interface AlchemicalHydraConfig extends Config {
 	String misc = "Misc";
 
 	// General
-
 	@ConfigItem(
 		keyName = "hydraImmunityOutline",
 		name = "Hydra immunity outline",
@@ -77,82 +75,6 @@ public interface AlchemicalHydraConfig extends Config {
 	}
 
 	@ConfigItem(
-		name = "Font style",
-		description = "Fountain ticks Font style can be bold, plain, or italicized.",
-		position = 3,
-		keyName = "fountainTicksFontStyle",
-		section = general,
-		hidden = true
-	)
-	default FontStyle fountainTicksFontStyle()
-	{
-		return FontStyle.BOLD;
-	}
-
-	@ConfigItem(
-		name = "Font shadow",
-		description = "Toggle fountain ticks font shadow.",
-		position = 4,
-		keyName = "fountainTicksFontShadow",
-		section = general,
-		hidden = true
-	)
-	default boolean fountainTicksFontShadow()
-	{
-		return true;
-	}
-
-	@Range(
-		min = 12,
-		max = 64
-	)
-	@ConfigItem(
-		name = "Font size",
-		description = "Adjust fountain ticks font size.",
-		position = 5,
-		keyName = "fountainTicksFontSize",
-		section = general,
-		hidden = true
-	)
-	@Units(Units.TICKS)
-	default int fountainTicksFontSize()
-	{
-		return 16;
-	}
-
-	@Alpha
-	@ConfigItem(
-		name = "Font color",
-		description = "Adjust fountain ticks font color.",
-		position = 6,
-		keyName = "fountainTicksFontColor",
-		section = general,
-		hidden = true
-	)
-	default Color fountainTicksFontColor()
-	{
-		return new Color(255, 255, 255, 255);
-	}
-
-	@Range(
-		min = -100,
-		max = 100
-	)
-	@ConfigItem(
-		name = "Font zOffset",
-		description = "Adjust the fountain ticks  Z coordinate offset.",
-		position = 7,
-		keyName = "fountainTicksFontZOffset",
-		section = general,
-		hidden = true
-	)
-	@Units(Units.TICKS)
-	default int fountainTicksFontZOffset()
-	{
-		return 0;
-	}
-
-	@ConfigItem(
 		keyName = "hidePrayerOnSpecial",
 		name = "Hide prayer on special attack",
 		description = "Hide prayer overlay during special attacks."
@@ -177,82 +99,6 @@ public interface AlchemicalHydraConfig extends Config {
 	}
 
 	@ConfigItem(
-		name = "Font style",
-		description = "Font style can be bold, plain, or italicized.",
-		position = 10,
-		keyName = "fontStyle",
-		section = general,
-		hidden = true
-	)
-	default FontStyle fontStyle()
-	{
-		return FontStyle.BOLD;
-	}
-
-	@ConfigItem(
-		name = "Font shadow",
-		description = "Toggle font shadow.",
-		position = 11,
-		keyName = "fontShadow",
-		section = general,
-		hidden = true
-	)
-	default boolean fontShadow()
-	{
-		return true;
-	}
-
-	@Range(
-		min = 12,
-		max = 64
-	)
-	@ConfigItem(
-		name = "Font size",
-		description = "Adjust font size.",
-		position = 12,
-		keyName = "fontSize",
-		section = general,
-		hidden = true
-	)
-	@Units(Units.TICKS)
-	default int fontSize()
-	{
-		return 16;
-	}
-
-	@Alpha
-	@ConfigItem(
-		name = "Font color",
-		description = "Adjust font color.",
-		position = 13,
-		keyName = "fontColor",
-		section = general,
-		hidden = true
-	)
-	default Color fontColor()
-	{
-		return new Color(255, 255, 255, 255);
-	}
-
-	@Range(
-		min = -100,
-		max = 100
-	)
-	@ConfigItem(
-		name = "Font zOffset",
-		description = "Adjust the Z coordinate offset.",
-		position = 14,
-		keyName = "fontZOffset",
-		section = general,
-		hidden = true
-	)
-	@Units(Units.TICKS)
-	default int fontZOffset()
-	{
-		return 0;
-	}
-
-	@ConfigItem(
 		keyName = "lightningOutline",
 		name = "Lightning outline",
 		description = "Overlay lightning tiles with a colored outline.",
@@ -273,8 +119,7 @@ public interface AlchemicalHydraConfig extends Config {
 		description = "Change the stroke width of the lightning tile outline.",
 		position = 1,
 		keyName = "lightningStroke",
-		section = specialAttacks,
-		hidden = true
+		section = specialAttacks
 	)
 	@Units(Units.PIXELS)
 	default int lightningStroke()
@@ -288,8 +133,7 @@ public interface AlchemicalHydraConfig extends Config {
 		description = "Change the tile outline color of lightning.",
 		position = 2,
 		keyName = "lightningOutlineColor",
-		section = specialAttacks,
-		hidden = true
+		section = specialAttacks
 	)
 	default Color lightningOutlineColor()
 	{
@@ -302,8 +146,7 @@ public interface AlchemicalHydraConfig extends Config {
 		description = "Change the tile fill color of lightning.",
 		position = 3,
 		keyName = "lightningFillColor",
-		section = specialAttacks,
-		hidden = true
+		section = specialAttacks
 	)
 	default Color lightningFillColor()
 	{
@@ -331,8 +174,7 @@ public interface AlchemicalHydraConfig extends Config {
 		description = "Change the stroke width of the poison tile outline.",
 		position = 5,
 		keyName = "poisonStroke",
-		section = specialAttacks,
-		hidden = true
+		section = specialAttacks
 	)
 	@Units(Units.PIXELS)
 	default int poisonStroke()
@@ -346,8 +188,7 @@ public interface AlchemicalHydraConfig extends Config {
 		name = "Outline color",
 		description = "Outline color of poison area tiles.",
 		position = 6,
-		section = specialAttacks,
-		hidden = true
+		section = specialAttacks
 	)
 	default Color poisonOutlineColor()
 	{
@@ -360,16 +201,14 @@ public interface AlchemicalHydraConfig extends Config {
 		name = "Outline fill color",
 		description = "Fill color of poison area tiles.",
 		position = 7,
-		section = specialAttacks,
-		hidden = true
+		section = specialAttacks
 	)
 	default Color poisonFillColor()
 	{
-		return new Color(255, 0, 0, 30);
+		return new Color(18, 227, 61, 197);
 	}
 
 	// Misc
-
 	@Alpha
 	@ConfigItem(
 		keyName = "safeColor",
@@ -407,25 +246,5 @@ public interface AlchemicalHydraConfig extends Config {
 	default Color dangerColor()
 	{
 		return new Color(150, 0, 0, 150);
-	}
-
-	// Constants
-
-	@Getter
-	@AllArgsConstructor
-	enum FontStyle
-	{
-		BOLD("Bold", Font.BOLD),
-		ITALIC("Italic", Font.ITALIC),
-		PLAIN("Plain", Font.PLAIN);
-
-		private final String name;
-		private final int font;
-
-		@Override
-		public String toString()
-		{
-			return name;
-		}
 	}
 }
