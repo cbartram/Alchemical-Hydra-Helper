@@ -110,35 +110,29 @@ public class AlchemicalHydraPlugin extends Plugin
 	private final Set<GameObject> vents = new HashSet<>();
 
 	@Provides
-	AlchemicalHydraConfig provideConfig(final ConfigManager configManager)
-	{
+	AlchemicalHydraConfig provideConfig(final ConfigManager configManager) {
 		return configManager.getConfig(AlchemicalHydraConfig.class);
 	}
 
 	@Override
-	protected void startUp()
-	{
-		if (client.getGameState() == GameState.LOGGED_IN && isInHydraRegion())
-		{
+	protected void startUp() {
+		if (client.getGameState() == GameState.LOGGED_IN && isInHydraRegion()) {
 			init();
 		}
 	}
 
-	private void init()
-	{
+	private void init() {
 		atHydra = true;
 
 		addOverlays();
 
-		for (final NPC npc : client.getNpcs())
-		{
+		for (final NPC npc : client.getNpcs()) {
 			onNpcSpawned(new NpcSpawned(npc));
 		}
 	}
 
 	@Override
-	protected void shutDown()
-	{
+	protected void shutDown() {
 		atHydra = false;
 
 		removeOverlays();
@@ -152,24 +146,17 @@ public class AlchemicalHydraPlugin extends Plugin
 	}
 
 	@Subscribe
-	private void onGameStateChanged(final GameStateChanged event)
-	{
+	private void onGameStateChanged(final GameStateChanged event) {
 		final GameState gameState = event.getGameState();
 
-		switch (gameState)
-		{
+		switch (gameState) {
 			case LOGGED_IN:
-				if (isInHydraRegion())
-				{
-					if (!atHydra)
-					{
+				if (isInHydraRegion()) {
+					if (!atHydra) {
 						init();
 					}
-				}
-				else
-				{
-					if (atHydra)
-					{
+				} else {
+					if (atHydra) {
 						shutDown();
 					}
 				}
@@ -186,53 +173,44 @@ public class AlchemicalHydraPlugin extends Plugin
 	}
 
 	@Subscribe
-	private void onGameObjectSpawned(GameObjectSpawned event)
-	{
-		if (!isInHydraRegion())
-		{
+	private void onGameObjectSpawned(GameObjectSpawned event) {
+		if (!isInHydraRegion()) {
 			return;
 		}
 		GameObject gameobject = event.getGameObject();
 		int id = gameobject.getId();
-		if (id == ObjectID.CHEMICAL_VENT_RED || id == ObjectID.CHEMICAL_VENT_GREEN || id == ObjectID.CHEMICAL_VENT_BLUE)
-		{
+		if (id == ObjectID.CHEMICAL_VENT_RED || id == ObjectID.CHEMICAL_VENT_GREEN || id == ObjectID.CHEMICAL_VENT_BLUE) {
 			vents.add(gameobject);
 		}
 	}
 
 	@Subscribe
-	private void onGameObjectDespawned(GameObjectDespawned event)
-	{
+	private void onGameObjectDespawned(GameObjectDespawned event) {
 		GameObject gameobject = event.getGameObject();
 		vents.remove(gameobject);
 	}
 
 
 	@Subscribe
-	private void onGameTick(final GameTick event)
-	{
+	private void onGameTick(final GameTick event) {
 		attackOverlay.decrementStunTicks();
 		updateVentTicks();
+
+		System.out.println("Hydra Health till phase change: " + hydra.getHpUntilPhaseChange());
 	}
 
-	private void updateVentTicks()
-	{
-		if (fountainTicks > 0)
-		{
+	private void updateVentTicks() {
+		if (fountainTicks > 0) {
 			fountainTicks--;
-			if (fountainTicks == 0)
-			{
+			if (fountainTicks == 0) {
 				fountainTicks = 8;
 			}
 		}
 
-		if (!vents.isEmpty())
-		{
-			for (final GameObject vent : vents)
-			{
+		if (!vents.isEmpty()) {
+			for (final GameObject vent : vents) {
 				int animation = getAnimation(vent);
-				if (animation == 8279 && lastFountainAnim == 8280)
-				{
+				if (animation == 8279 && lastFountainAnim == 8280) {
 					fountainTicks = 2;
 				}
 				lastFountainAnim = animation;
@@ -242,34 +220,28 @@ public class AlchemicalHydraPlugin extends Plugin
 
 	}
 
-	int getAnimation(GameObject gameObject)
-	{
+	int getAnimation(GameObject gameObject) {
 		final DynamicObject dynamicObject = (DynamicObject) gameObject.getRenderable();
 		return dynamicObject.getAnimation().getId();
 	}
 
 	@Subscribe
-	private void onNpcSpawned(final NpcSpawned event)
-	{
+	private void onNpcSpawned(final NpcSpawned event) {
 		final NPC npc = event.getNpc();
 
-		if (npc.getId() == NpcID.ALCHEMICAL_HYDRA)
-		{
+		if (npc.getId() == NpcID.ALCHEMICAL_HYDRA) {
 			hydra = new Hydra(npc);
-			if (client.isInInstancedRegion() && fountainTicks == -1) //handles the initial hydra spawn when your in the lobby but havent gone through the main doors
-			{
+			if (client.isInInstancedRegion() && fountainTicks == -1) {
 				fountainTicks = 11;
 			}
 		}
 	}
 
 	@Subscribe
-	private void onAnimationChanged(final AnimationChanged event)
-	{
+	private void onAnimationChanged(final AnimationChanged event) {
 		final Actor actor = event.getActor();
 
-		if (hydra == null || actor != hydra.getNpc())
-		{
+		if (hydra == null || actor != hydra.getNpc()) {
 			return;
 		}
 
@@ -277,26 +249,27 @@ public class AlchemicalHydraPlugin extends Plugin
 
 		final int animationId = actor.getAnimation();
 
-		if ((animationId == phase.getDeathAnimation2() && phase != HydraPhase.FLAME)
-			|| (animationId == phase.getDeathAnimation1() && phase == HydraPhase.FLAME))
-		{
-			switch (phase)
-			{
+		System.out.println("Anim changed.");
+		if ((animationId == phase.getDeathAnimation2() && phase != HydraPhase.FLAME) || (animationId == phase.getDeathAnimation1() && phase == HydraPhase.FLAME)) {
+			switch (phase) {
 				case POISON:
+					System.out.println("Changing phase to: LIGHTNING.");
 					hydra.changePhase(HydraPhase.LIGHTNING);
 					break;
 				case LIGHTNING:
+					System.out.println("Changing phase to: FLAME.");
 					hydra.changePhase(HydraPhase.FLAME);
 					break;
 				case FLAME:
+					System.out.println("Changing phase to: ENRAGE.");
 					hydra.changePhase(HydraPhase.ENRAGED);
 					break;
 				case ENRAGED:
+					System.out.println("In enrage phase.");
 					// NpcDespawned event does not fire for Hydra inbetween kills; must use death animation.
 					hydra = null;
 
-					if (!poisonProjectiles.isEmpty())
-					{
+					if (!poisonProjectiles.isEmpty()) {
 						poisonProjectiles.clear();
 					}
 					break;
@@ -304,13 +277,12 @@ public class AlchemicalHydraPlugin extends Plugin
 
 			return;
 		}
-		else if (animationId == phase.getSpecialAnimationId() && phase.getSpecialAnimationId() != 0)
-		{
+		else if (animationId == phase.getSpecialAnimationId() && phase.getSpecialAnimationId() != 0) {
+			System.out.println("Setting next special attack to 9 more auto's");
 			hydra.setNextSpecial();
 		}
 
-		if (!poisonProjectiles.isEmpty())
-		{
+		if (!poisonProjectiles.isEmpty()) {
 			poisonProjectiles.values().removeIf(p -> p.getEndCycle() < client.getGameCycle());
 		}
 	}
@@ -321,25 +293,20 @@ public class AlchemicalHydraPlugin extends Plugin
 	{
 		final Projectile projectile = event.getProjectile();
 
-		if (hydra == null || client.getGameCycle() >= projectile.getStartCycle())
-		{
+		if (hydra == null || client.getGameCycle() >= projectile.getStartCycle()) {
 			return;
 		}
 
 		final int projectileId = projectile.getId();
 
-		if (hydra.getPhase().getSpecialProjectileId() == projectileId)
-		{
-			if (hydra.getAttackCount() >= hydra.getNextSpecial())
-			{
+		if (hydra.getPhase().getSpecialProjectileId() == projectileId) {
+			if (hydra.getAttackCount() >= hydra.getNextSpecial()) {
+				System.out.println("Setting next special count to +9 since the attack count >= the next special.");
 				hydra.setNextSpecial();
 			}
 
 			poisonProjectiles.put(event.getPosition(), projectile);
-		}
-		else if (client.getTickCount() != lastAttackTick
-			&& (projectileId == Hydra.AttackStyle.MAGIC.getProjectileID() || projectileId == Hydra.AttackStyle.RANGED.getProjectileID()))
-		{
+		} else if (client.getTickCount() != lastAttackTick && (projectileId == Hydra.AttackStyle.MAGIC.getProjectileID() || projectileId == Hydra.AttackStyle.RANGED.getProjectileID())) {
 			hydra.handleProjectile(projectileId);
 
 			lastAttackTick = client.getTickCount();
@@ -347,46 +314,35 @@ public class AlchemicalHydraPlugin extends Plugin
 	}
 
 	@Subscribe
-	private void onChatMessage(final ChatMessage event)
-	{
+	private void onChatMessage(final ChatMessage event) {
 		final ChatMessageType chatMessageType = event.getType();
 
-		if (chatMessageType != ChatMessageType.SPAM && chatMessageType != ChatMessageType.GAMEMESSAGE)
-		{
+		if (chatMessageType != ChatMessageType.SPAM && chatMessageType != ChatMessageType.GAMEMESSAGE) {
 			return;
 		}
 
 		final String message = event.getMessage();
 
-		if (message.equals(MESSAGE_NEUTRALIZE))
-		{
-			clientThread.invokeLater(() ->
-			{
-				hydra.setImmunity(false);
-			});
-		}
-		else if (message.equals(MESSAGE_STUN))
-		{
+		if (message.equals(MESSAGE_NEUTRALIZE)) {
+			clientThread.invokeLater(() -> hydra.setImmunity(false));
+		} else if (message.equals(MESSAGE_STUN)) {
 			attackOverlay.setStunTicks();
 		}
 	}
 
-	private void addOverlays()
-	{
+	private void addOverlays() {
 		overlayManager.add(sceneOverlay);
 		overlayManager.add(attackOverlay);
 		overlayManager.add(prayerOverlay);
 	}
 
-	private void removeOverlays()
-	{
+	private void removeOverlays() {
 		overlayManager.remove(sceneOverlay);
 		overlayManager.remove(attackOverlay);
 		overlayManager.remove(prayerOverlay);
 	}
 
-	private boolean isInHydraRegion()
-	{
+	private boolean isInHydraRegion() {
 		return client.isInInstancedRegion() && Arrays.equals(client.getMapRegions(), HYDRA_REGIONS);
 	}
 }

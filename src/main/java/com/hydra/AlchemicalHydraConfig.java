@@ -14,8 +14,7 @@ import net.runelite.client.config.Range;
 import net.runelite.client.config.Units;
 
 @ConfigGroup("alchemicalhydra")
-public interface AlchemicalHydraConfig extends Config
-{
+public interface AlchemicalHydraConfig extends Config {
 	// Sections
 
 	@ConfigSection(
@@ -173,8 +172,7 @@ public interface AlchemicalHydraConfig extends Config
 		position = 9,
 		section = general
 	)
-	default boolean showHpUntilPhaseChange()
-	{
+	default boolean showHpUntilPhaseChange() {
 		return false;
 	}
 
@@ -253,8 +251,6 @@ public interface AlchemicalHydraConfig extends Config
 	{
 		return 0;
 	}
-
-	// Special Attacks
 
 	@ConfigItem(
 		keyName = "lightningOutline",

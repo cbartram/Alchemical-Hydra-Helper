@@ -34,8 +34,7 @@ import net.runelite.client.ui.overlay.OverlayPosition;
 import net.runelite.client.ui.overlay.outline.ModelOutlineRenderer;
 
 @Singleton
-public class SceneOverlay extends Overlay
-{
+public class SceneOverlay extends Overlay {
 	private static final int LIGHTNING_ID = 1666;
 
 	private static final Area POISON_AREA = new Area();
@@ -55,8 +54,7 @@ public class SceneOverlay extends Overlay
 
 	@Inject
 	public SceneOverlay(final Client client, final AlchemicalHydraPlugin plugin,
-						final ModelOutlineRenderer modelOutlineRenderer)
-	{
+						final ModelOutlineRenderer modelOutlineRenderer) {
 		this.client = client;
 		this.plugin = plugin;
 		this.modelOutlineRenderer = modelOutlineRenderer;
@@ -66,12 +64,10 @@ public class SceneOverlay extends Overlay
 	}
 
 	@Override
-	public Dimension render(final Graphics2D graphics2D)
-	{
+	public Dimension render(final Graphics2D graphics2D) {
 		hydra = plugin.getHydra();
 
-		if (hydra == null)
-		{
+		if (hydra == null) {
 			return null;
 		}
 
@@ -85,21 +81,17 @@ public class SceneOverlay extends Overlay
 		return null;
 	}
 
-	private void renderPoisonProjectileAreaTiles(final Graphics2D graphics2D)
-	{
+	private void renderPoisonProjectileAreaTiles(final Graphics2D graphics2D) {
 		final Map<LocalPoint, Projectile> poisonProjectiles = plugin.getPoisonProjectiles();
 
-		if (!config.poisonOutline() || poisonProjectiles.isEmpty())
-		{
+		if (!config.poisonOutline() || poisonProjectiles.isEmpty()) {
 			return;
 		}
 
 		POISON_AREA.reset();
 
-		for (final Map.Entry<LocalPoint, Projectile> entry : poisonProjectiles.entrySet())
-		{
-			if (entry.getValue().getEndCycle() < client.getGameCycle())
-			{
+		for (final Map.Entry<LocalPoint, Projectile> entry : poisonProjectiles.entrySet()) {
+			if (entry.getValue().getEndCycle() < client.getGameCycle()) {
 				continue;
 			}
 
@@ -107,8 +99,7 @@ public class SceneOverlay extends Overlay
 
 			final Polygon polygon = getCanvasTileAreaPoly(client, localPoint, POISON_AOE_AREA_SIZE);
 
-			if (polygon != null)
-			{
+			if (polygon != null) {
 				POISON_AREA.add(new Area(polygon));
 			}
 		}
@@ -116,40 +107,31 @@ public class SceneOverlay extends Overlay
 		drawOutlineAndFill(graphics2D, config.poisonOutlineColor(), config.poisonFillColor(), config.poisonStroke(), POISON_AREA);
 	}
 
-	private void renderLightning(final Graphics2D graphics2D)
-	{
+	private void renderLightning(final Graphics2D graphics2D) {
 		final Deque<GraphicsObject> graphicsObjects = client.getTopLevelWorldView().getGraphicsObjects();
 
-		if (!config.lightningOutline())
-		{
-			System.out.println("Lightning outline is not enabled in config.");
+		if (!config.lightningOutline()) {
 			return;
 		}
 
 		if (hydra.getPhase() != HydraPhase.LIGHTNING) {
-			System.out.println("Its not the lightning phase yet.");
 			return;
 		}
 
-		for (final GraphicsObject graphicsObject : graphicsObjects)
-		{
-			if (graphicsObject.getId() != LIGHTNING_ID)
-			{
+		for (final GraphicsObject graphicsObject : graphicsObjects) {
+			if (graphicsObject.getId() != LIGHTNING_ID) {
 				continue;
 			}
 
 			final LocalPoint localPoint = graphicsObject.getLocation();
-			System.out.println("Lightning graphics object identified.");
 
-			if (localPoint == null)
-			{
+			if (localPoint == null) {
 				return;
 			}
 
 			final Polygon polygon = Perspective.getCanvasTilePoly(client, localPoint);
 
-			if (polygon == null)
-			{
+			if (polygon == null) {
 				return;
 			}
 
@@ -169,31 +151,25 @@ public class SceneOverlay extends Overlay
 
 		final WorldPoint fountainWorldPoint = hydra.getPhase().getFountainWorldPoint();
 
-		if (fountainWorldPoint != null)
-		{
+		if (fountainWorldPoint != null) {
 			final Collection<WorldPoint> fountainWorldPoints = WorldPoint.toLocalInstance(client, fountainWorldPoint);
 
-			if (fountainWorldPoints.size() == 1)
-			{
+			if (fountainWorldPoints.size() == 1) {
 				WorldPoint worldPoint = null;
 
-				for (final WorldPoint wp : fountainWorldPoints)
-				{
+				for (final WorldPoint wp : fountainWorldPoints) {
 					worldPoint = wp;
 				}
 
 				final LocalPoint localPoint = LocalPoint.fromWorld(client, worldPoint);
 
-				if (localPoint != null)
-				{
+				if (localPoint != null) {
 					final Polygon polygon = getCanvasTileAreaPoly(client, localPoint, 3);
 
-					if (polygon != null)
-					{
+					if (polygon != null) {
 						int stroke = HYDRA_HULL_OUTLINE_STROKE_SIZE;
 
-						if (npc.getWorldArea().intersectsWith(new WorldArea(worldPoint, 1, 1)))
-						{
+						if (npc.getWorldArea().intersectsWith(new WorldArea(worldPoint, 1, 1))) {
 							stroke++;
 						}
 
@@ -208,59 +184,49 @@ public class SceneOverlay extends Overlay
 		modelOutlineRenderer.drawOutline(npc, HYDRA_HULL_OUTLINE_STROKE_SIZE, hydra.getPhase().getPhaseColor(), 0);
 	}
 
-	private void renderFountainOutline(final Graphics2D graphics2D)
-	{
+	private void renderFountainOutline(final Graphics2D graphics2D) {
 		final NPC npc = hydra.getNpc();
 		final WorldPoint fountainWorldPoint = hydra.getPhase().getFountainWorldPoint();
 
-		if (!config.fountainOutline() || !hydra.isImmunity() || fountainWorldPoint == null || npc == null || npc.isDead())
-		{
+		if (!config.fountainOutline() || !hydra.isImmunity() || fountainWorldPoint == null || npc == null || npc.isDead()) {
 			return;
 		}
 
 		final Collection<WorldPoint> fountainWorldPoints = WorldPoint.toLocalInstance(client, fountainWorldPoint);
 
-		if (fountainWorldPoints.size() != 1)
-		{
+		if (fountainWorldPoints.size() != 1) {
 			return;
 		}
 
 		WorldPoint worldPoint = null;
 
-		for (final WorldPoint wp : fountainWorldPoints)
-		{
+		for (final WorldPoint wp : fountainWorldPoints) {
 			worldPoint = wp;
 		}
 
 		final LocalPoint localPoint = LocalPoint.fromWorld(client, worldPoint);
 
-		if (localPoint == null)
-		{
+		if (localPoint == null) {
 			return;
 		}
 
 		final Polygon polygon = getCanvasTileAreaPoly(client, localPoint, 3);
 
-		if (polygon == null)
-		{
+		if (polygon == null) {
 			return;
 		}
 
 		Color color = hydra.getPhase().getFountainColor();
 
-		if (!npc.getWorldArea().intersectsWith(new WorldArea(worldPoint, 1, 1)))
-		{
+		if (!npc.getWorldArea().intersectsWith(new WorldArea(worldPoint, 1, 1))) {
 			color = color.darker();
 		}
 
 		drawOutlineAndFill(graphics2D, color, new Color(color.getRed(), color.getGreen(), color.getBlue(), 30), 1, polygon);
 	}
 
-	private void renderFountainTicks(final Graphics2D graphics2D)
-	{
-
-		if (!config.fountainTicks())
-		{
+	private void renderFountainTicks(final Graphics2D graphics2D) {
+		if (!config.fountainTicks()) {
 			return;
 		}
 
@@ -268,15 +234,13 @@ public class SceneOverlay extends Overlay
 		fountainWorldPoints.addAll(WorldPoint.toLocalInstance(client, HydraPhase.LIGHTNING.getFountainWorldPoint()));
 		fountainWorldPoints.addAll(WorldPoint.toLocalInstance(client, HydraPhase.FLAME.getFountainWorldPoint()));
 
-		if (fountainWorldPoints.isEmpty())
-		{
+		if (fountainWorldPoints.isEmpty()) {
 			return;
 		}
 
 		WorldPoint worldPoint;
 
-		for (final WorldPoint wp : fountainWorldPoints)
-		{
+		for (final WorldPoint wp : fountainWorldPoints) {
 			worldPoint = wp;
 			final LocalPoint localPoint = LocalPoint.fromWorld(client, worldPoint);
 
@@ -305,19 +269,16 @@ public class SceneOverlay extends Overlay
 
 	}
 
-	private void renderHpUntilPhaseChange(final Graphics2D graphics2D)
-	{
+	private void renderHpUntilPhaseChange(final Graphics2D graphics2D) {
 		final NPC npc = hydra.getNpc();
 
-		if (!config.showHpUntilPhaseChange() || npc == null || npc.isDead())
-		{
+		if (!config.showHpUntilPhaseChange() || npc == null || npc.isDead()) {
 			return;
 		}
 
 		final int hpUntilPhaseChange = hydra.getHpUntilPhaseChange();
 
-		if (hpUntilPhaseChange == 0)
-		{
+		if (hpUntilPhaseChange == 0) {
 			return;
 		}
 
@@ -325,8 +286,7 @@ public class SceneOverlay extends Overlay
 
 		final Point point = npc.getCanvasTextLocation(graphics2D, text, 0);
 
-		if (point == null)
-		{
+		if (point == null) {
 			return;
 		}
 
@@ -342,8 +302,7 @@ public class SceneOverlay extends Overlay
 		);
 	}
 
-	private static void drawOutlineAndFill(final Graphics2D graphics2D, final Color outlineColor, final Color fillColor, final float strokeWidth, final Shape shape)
-	{
+	private static void drawOutlineAndFill(final Graphics2D graphics2D, final Color outlineColor, final Color fillColor, final float strokeWidth, final Shape shape) {
 		final Color originalColor = graphics2D.getColor();
 		final Stroke originalStroke = graphics2D.getStroke();
 

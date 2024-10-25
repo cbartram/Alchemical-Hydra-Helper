@@ -15,6 +15,7 @@ import net.runelite.client.util.ImageUtil;
 
 import static com.hydra.AlchemicalHydraPlugin.*;
 
+
 @Getter
 @RequiredArgsConstructor
 public enum HydraPhase
@@ -42,10 +43,8 @@ public enum HydraPhase
 
 	private BufferedImage specialImage;
 
-	public BufferedImage getSpecialImage(final SpriteManager spriteManager)
-	{
-		if (specialImage == null)
-		{
+	public BufferedImage getSpecialImage(final SpriteManager spriteManager) {
+		if (specialImage == null) {
 			final BufferedImage tmp = spriteManager.getSprite(spriteId, 0);
 			specialImage = tmp == null ? null : ImageUtil.resizeImage(tmp, AttackOverlay.IMAGE_SIZE, AttackOverlay.IMAGE_SIZE);
 		}

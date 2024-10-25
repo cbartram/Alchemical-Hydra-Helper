@@ -71,8 +71,7 @@ public class AttackOverlay extends Overlay
 	private Hydra hydra;
 
 	@Inject
-	AttackOverlay(final Client client, final AlchemicalHydraPlugin plugin, final AlchemicalHydraConfig config, final SpriteManager spriteManager)
-	{
+	AttackOverlay(final Client client, final AlchemicalHydraPlugin plugin, final AlchemicalHydraConfig config, final SpriteManager spriteManager) {
 		this.client = client;
 		this.plugin = plugin;
 		this.config = config;
@@ -86,12 +85,10 @@ public class AttackOverlay extends Overlay
 	}
 
 	@Override
-	public Dimension render(final Graphics2D graphics2D)
-	{
+	public Dimension render(final Graphics2D graphics2D) {
 		hydra = plugin.getHydra();
 
-		if (hydra == null)
-		{
+		if (hydra == null) {
 			return null;
 		}
 
@@ -113,10 +110,8 @@ public class AttackOverlay extends Overlay
 		return panelComponent.render(graphics2D);
 	}
 
-	public void decrementStunTicks()
-	{
-		if (stunTicks > 0)
-		{
+	public void decrementStunTicks() {
+		if (stunTicks > 0) {
 			--stunTicks;
 		}
 	}
@@ -126,20 +121,16 @@ public class AttackOverlay extends Overlay
 		stunTicks = STUN_TICK_DURATION;
 	}
 
-	private void clearPanelComponent()
-	{
+	private void clearPanelComponent() {
 		final List<LayoutableRenderableEntity> children = panelComponent.getChildren();
 
-		if (!children.isEmpty())
-		{
+		if (!children.isEmpty()) {
 			children.clear();
 		}
 	}
 
-	private void updateStunComponent()
-	{
-		if (stunTicks <= 0)
-		{
+	private void updateStunComponent() {
+		if (stunTicks <= 0) {
 			return;
 		}
 
@@ -148,25 +139,18 @@ public class AttackOverlay extends Overlay
 		panelComponent.getChildren().add(stunComponent);
 	}
 
-	private void updatePhaseSpecialComponent()
-	{
+	private void updatePhaseSpecialComponent() {
 		final int nextSpec = hydra.getNextSpecialRelative();
 
-		if (nextSpec > 3 || nextSpec < 0)
-		{
+		if (nextSpec > 3 || nextSpec < 0) {
 			return;
 		}
 
-		if (nextSpec == 0)
-		{
+		if (nextSpec == 0) {
 			phaseSpecialComponent.setBackgroundColor(config.dangerColor());
-		}
-		else if (nextSpec == 1)
-		{
+		} else if (nextSpec == 1) {
 			phaseSpecialComponent.setBackgroundColor(config.warningColor());
-		}
-		else
-		{
+		} else {
 			phaseSpecialComponent.setBackgroundColor(STANDARD_BACKGROUND_COLOR);
 		}
 

@@ -41,8 +41,7 @@ public class Hydra
 
 	private int nextSwitch = phase.getAttacksPerSwitch();
 
-	public void setNextSpecial()
-	{
+	public void setNextSpecial() {
 		nextSpecial += 9;
 	}
 
