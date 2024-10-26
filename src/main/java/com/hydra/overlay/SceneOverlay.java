@@ -102,7 +102,7 @@ public class SceneOverlay extends Overlay {
 			}
 		}
 
-		drawOutlineAndFill(graphics2D, config.poisonOutlineColor(), config.poisonFillColor(), config.poisonStroke(), POISON_AREA);
+		drawOutlineAndFill(graphics2D, Color.RED, new Color(18, 227, 61, 89), 1, POISON_AREA);
 	}
 
 	/**
@@ -137,8 +137,8 @@ public class SceneOverlay extends Overlay {
 				return;
 			}
 
-			drawOutlineAndFill(graphics2D, config.lightningOutlineColor(), config.lightningFillColor(),
-				config.lightningStroke(), polygon);
+			drawOutlineAndFill(graphics2D, Color.CYAN, new Color(20, 220, 220, 98),
+				2, polygon);
 		}
 	}
 

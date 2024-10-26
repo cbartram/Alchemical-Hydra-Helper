@@ -45,8 +45,7 @@ public interface AlchemicalHydraConfig extends Config {
 		position = 0,
 		section = general
 	)
-	default boolean hydraImmunityOutline()
-	{
+	default boolean hydraImmunityOutline() {
 		return false;
 	}
 
@@ -57,8 +56,7 @@ public interface AlchemicalHydraConfig extends Config {
 		position = 1,
 		section = general
 	)
-	default boolean fountainOutline()
-	{
+	default boolean fountainOutline() {
 		return false;
 	}
 
@@ -69,8 +67,7 @@ public interface AlchemicalHydraConfig extends Config {
 		position = 2,
 		section = general
 	)
-	default boolean fountainTicks()
-	{
+	default boolean fountainTicks() {
 		return false;
 	}
 
@@ -82,8 +79,7 @@ public interface AlchemicalHydraConfig extends Config {
 		position = 8,
 		section = general
 	)
-	default boolean hidePrayerOnSpecial()
-	{
+	default boolean hidePrayerOnSpecial() {
 		return false;
 	}
 
@@ -100,57 +96,24 @@ public interface AlchemicalHydraConfig extends Config {
 
 	@ConfigItem(
 		keyName = "lightningOutline",
-		name = "Lightning outline",
+		name = "Lightning Outline",
 		description = "Overlay lightning tiles with a colored outline.",
 		position = 0,
 		section = specialAttacks
 	)
-	default boolean lightningOutline()
-	{
+	default boolean lightningOutline() {
 		return true;
 	}
 
-	@Range(
-		min = 1,
-		max = 8
-	)
 	@ConfigItem(
-		name = "Outline width",
-		description = "Change the stroke width of the lightning tile outline.",
-		position = 1,
-		keyName = "lightningStroke",
-		section = specialAttacks
+		keyName = "prayerTabOverlay",
+		name = "Prayer Tab Overlay",
+		description = "Draws rectangles around the correct prayer to click in the prayer tab.",
+		section = general,
+		position = 10
 	)
-	@Units(Units.PIXELS)
-	default int lightningStroke()
-	{
-		return 2;
-	}
-
-	@Alpha
-	@ConfigItem(
-		name = "Outline color",
-		description = "Change the tile outline color of lightning.",
-		position = 2,
-		keyName = "lightningOutlineColor",
-		section = specialAttacks
-	)
-	default Color lightningOutlineColor()
-	{
-		return Color.CYAN;
-	}
-
-	@Alpha
-	@ConfigItem(
-		name = "Outline fill color",
-		description = "Change the tile fill color of lightning.",
-		position = 3,
-		keyName = "lightningFillColor",
-		section = specialAttacks
-	)
-	default Color lightningFillColor()
-	{
-		return new Color(20, 220, 220, 98);
+	default boolean prayerTabOverlay() {
+		return false;
 	}
 
 	@ConfigItem(
@@ -160,52 +123,8 @@ public interface AlchemicalHydraConfig extends Config {
 		position = 4,
 		section = specialAttacks
 	)
-	default boolean poisonOutline()
-	{
+	default boolean poisonOutline() {
 		return false;
-	}
-
-	@Range(
-		min = 1,
-		max = 8
-	)
-	@ConfigItem(
-		name = "Outline width",
-		description = "Change the stroke width of the poison tile outline.",
-		position = 5,
-		keyName = "poisonStroke",
-		section = specialAttacks
-	)
-	@Units(Units.PIXELS)
-	default int poisonStroke()
-	{
-		return 1;
-	}
-
-	@Alpha
-	@ConfigItem(
-		keyName = "poisonOutlineColor",
-		name = "Outline color",
-		description = "Outline color of poison area tiles.",
-		position = 6,
-		section = specialAttacks
-	)
-	default Color poisonOutlineColor()
-	{
-		return Color.RED;
-	}
-
-	@Alpha
-	@ConfigItem(
-		keyName = "poisonFillColor",
-		name = "Outline fill color",
-		description = "Fill color of poison area tiles.",
-		position = 7,
-		section = specialAttacks
-	)
-	default Color poisonFillColor()
-	{
-		return new Color(18, 227, 61, 197);
 	}
 
 	// Misc
@@ -217,8 +136,7 @@ public interface AlchemicalHydraConfig extends Config {
 		position = 0,
 		section = misc
 	)
-	default Color safeColor()
-	{
+	default Color safeColor() {
 		return new Color(0, 150, 0, 150);
 	}
 
@@ -230,8 +148,7 @@ public interface AlchemicalHydraConfig extends Config {
 		position = 1,
 		section = misc
 	)
-	default Color warningColor()
-	{
+	default Color warningColor() {
 		return new Color(200, 150, 0, 150);
 	}
 
@@ -243,8 +160,7 @@ public interface AlchemicalHydraConfig extends Config {
 		position = 2,
 		section = misc
 	)
-	default Color dangerColor()
-	{
+	default Color dangerColor() {
 		return new Color(150, 0, 0, 150);
 	}
 }

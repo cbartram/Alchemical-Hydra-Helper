@@ -83,9 +83,7 @@ public class AttackOverlay extends Overlay {
 		}
 
 		clearPanelComponent();
-
 		updateStunComponent();
-
 		updatePhaseSpecialComponent();
 
 		if (config.hidePrayerOnSpecial() && isSpecialAttack()) {
@@ -93,7 +91,6 @@ public class AttackOverlay extends Overlay {
 		}
 
 		updatePrayerComponent();
-
 		renderPrayerWidget(graphics2D);
 
 		return panelComponent.render(graphics2D);
@@ -151,27 +148,30 @@ public class AttackOverlay extends Overlay {
 		panelComponent.getChildren().add(phaseSpecialComponent);
 	}
 
+	/**
+	 * Handles the logic necessary for updating the color, text, and icon for the correct prayer to pray.
+	 */
 	private void updatePrayerComponent() {
 		final Prayer nextPrayer = hydra.getNextAttack().getPrayer();
 		final int nextSwitch = hydra.getNextSwitch();
 
-
-
 		if (nextSwitch == 1) {
-			prayerComponent.setBackgroundColor(client.isPrayerActive(nextPrayer) ? config.warningColor() : config.dangerColor());
+			if (hydra.getPhase() == HydraPhase.ENRAGED) {
+				prayerComponent.setBackgroundColor(client.isPrayerActive(nextPrayer) ? config.safeColor() : config.dangerColor());
+			} else {
+				prayerComponent.setBackgroundColor(client.isPrayerActive(nextPrayer) ? config.warningColor() : config.dangerColor());
+			}
 		} else {
 			prayerComponent.setBackgroundColor(client.isPrayerActive(nextPrayer) ? config.safeColor() : config.dangerColor());
 		}
 
 		prayerComponent.setImage(hydra.getNextAttack().getImage(spriteManager));
 		prayerComponent.setText(INFO_BOX_TEXT_PADDING + nextSwitch);
-
 		panelComponent.getChildren().add(prayerComponent);
 	}
 
 	private void renderPrayerWidget(final Graphics2D graphics2D) {
 		final Prayer prayer = hydra.getNextAttack().getPrayer();
-
 		OverlayUtil.renderPrayerOverlay(graphics2D, client, prayer, prayer == Prayer.PROTECT_FROM_MAGIC ? Color.CYAN : Color.GREEN);
 	}
 
@@ -195,27 +195,23 @@ public class AttackOverlay extends Overlay {
 		final SpritePixels root = getSprite(SpriteID.SPELL_ENTANGLE);
 		final SpritePixels mark = getSprite(SpriteID.TRADE_EXCLAMATION_MARK_ITEM_REMOVAL_WARNING);
 
-		if (mark == null || root == null)
-		{
+		if (mark == null || root == null) {
 			return null;
 		}
 
 		return ImageUtil.resizeImage(root.toBufferedImage(), IMAGE_SIZE, IMAGE_SIZE);
 	}
 
-	private SpritePixels getSprite(final int spriteId)
-	{
+	private SpritePixels getSprite(final int spriteId) {
 		final IndexDataBase spriteDatabase = client.getIndexSprites();
 
-		if (spriteDatabase == null)
-		{
+		if (spriteDatabase == null) {
 			return null;
 		}
 
 		final SpritePixels[] sprites = client.getSprites(spriteDatabase, spriteId, 0);
 
-		if (sprites == null)
-		{
+		if (sprites == null) {
 			return null;
 		}
 

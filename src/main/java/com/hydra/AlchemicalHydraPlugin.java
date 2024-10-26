@@ -19,7 +19,6 @@ import net.runelite.api.events.*;
 import net.runelite.client.callback.ClientThread;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
-import net.runelite.client.events.ConfigChanged;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.ui.overlay.OverlayManager;
@@ -176,12 +175,12 @@ public class AlchemicalHydraPlugin extends Plugin
 		attackOverlay.decrementStunTicks();
 		updateVentTicks();
 		if(hydra != null) {
-
 			NPC npc = hydra.getNpc();
 			if(npc != null) {
 				int poseAnim = npc.getPoseAnimation();
 
-				// If the phase is POISON and we see either of pose anims for lightning swap phases
+				// If the phase is POISON and we see either of pose anims for lightning swap phases. Same goes for
+				// the other phases as well.
 				switch(hydra.getPhase()) {
 					case POISON:
 						if(poseAnim == HydraPhase.LIGHTNING.getPoseAnimationIdle() || poseAnim == HydraPhase.LIGHTNING.getPoseAnimationMoving()) {

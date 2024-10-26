@@ -6,6 +6,8 @@ import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.Polygon;
 import java.awt.Rectangle;
+
+import com.hydra.AlchemicalHydraConfig;
 import net.runelite.api.Client;
 import net.runelite.api.Point;
 import net.runelite.api.Prayer;
@@ -34,7 +36,8 @@ public class OverlayUtil {
 		}
 
 		// Only render this overlay if the player is currently looking at their prayer tab.
-		if (widget != null && client.getVarbitValue(VarClientInt.INVENTORY_TAB) != InterfaceID.PRAYER) {
+		System.out.println("Client varbit value for inventory tab: " + client.getVarbitValue(VarClientInt.INVENTORY_TAB));
+		if (widget != null && client.getVarbitValue(VarClientInt.INVENTORY_TAB) == 5) {
 			Rectangle bounds = widget.getBounds();
 			renderPolygon(graphics, rectangleToPolygon(bounds), color);
 		}
