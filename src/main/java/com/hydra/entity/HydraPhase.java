@@ -26,8 +26,8 @@ public enum HydraPhase {
 	ENRAGED(1, HYDRA_4_1, HYDRA_4_2, 1644, 0, 0, SpriteID.SPELL_CLAWS_OF_GUTHIX, null, null, null);
 
 	private final int attacksPerSwitch;
-	private final int deathAnimation1;
-	private final int deathAnimation2;
+	private final int poseAnimationIdle;
+	private final int poseAnimationMoving;
 	private final int specialProjectileId;
 	private final int specialAnimationId;
 	private final int hpThreshold;

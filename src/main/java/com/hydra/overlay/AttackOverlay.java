@@ -155,6 +155,8 @@ public class AttackOverlay extends Overlay {
 		final Prayer nextPrayer = hydra.getNextAttack().getPrayer();
 		final int nextSwitch = hydra.getNextSwitch();
 
+
+
 		if (nextSwitch == 1) {
 			prayerComponent.setBackgroundColor(client.isPrayerActive(nextPrayer) ? config.warningColor() : config.dangerColor());
 		} else {

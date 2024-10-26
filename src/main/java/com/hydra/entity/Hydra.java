@@ -55,7 +55,6 @@ public class Hydra {
 		immunity = true;
 
 		if (hydraPhase == HydraPhase.ENRAGED) {
-			System.out.println("Entering enraged phase...");
 			immunity = false;
 			switchStyles();
 			nextSwitch = phase.getAttacksPerSwitch();
@@ -90,12 +89,20 @@ public class Hydra {
 		return Math.max(0, getHp() - phase.getHpThreshold());
 	}
 
+	/**
+	 * Swaps the prayer based on the hydras last attack. If the last attack was magic the next
+	 * attack will be ranged and vice versa.
+	 */
 	private void switchStyles() {
 		nextAttack = lastAttack == AttackStyle.MAGIC
 			? AttackStyle.RANGED
 			: AttackStyle.MAGIC;
 	}
 
+	/**
+	 * Returns the amount of remaining HP for the Alchemical hydra
+	 * @return int The number of hitpoints remaining.
+	 */
 	private int getHp() {
 		final int ratio = npc.getHealthRatio();
 		final int health = npc.getHealthScale();

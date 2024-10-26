@@ -75,6 +75,10 @@ public class SceneOverlay extends Overlay {
 		return null;
 	}
 
+	/**
+	 * Renders the area affected by the Hydra's poison attacks in the first and final phases.
+	 * @param graphics2D
+	 */
 	private void renderPoisonProjectileAreaTiles(final Graphics2D graphics2D) {
 		final Map<LocalPoint, Projectile> poisonProjectiles = plugin.getPoisonProjectiles();
 
@@ -101,6 +105,10 @@ public class SceneOverlay extends Overlay {
 		drawOutlineAndFill(graphics2D, config.poisonOutlineColor(), config.poisonFillColor(), config.poisonStroke(), POISON_AREA);
 	}
 
+	/**
+	 * Renders an outline and fill on the tile where the lightning is currently.
+	 * @param graphics2D
+	 */
 	private void renderLightning(final Graphics2D graphics2D) {
 		final Deque<GraphicsObject> graphicsObjects = client.getTopLevelWorldView().getGraphicsObjects();
 
@@ -134,6 +142,9 @@ public class SceneOverlay extends Overlay {
 		}
 	}
 
+	/**
+	 * Renders an outline around the Hydra when it is immune to damage and must be lured underneath a fountain.
+	 */
 	private void renderHydraImmunityOutline()
 	{
 		final NPC npc = hydra.getNpc();
@@ -146,7 +157,7 @@ public class SceneOverlay extends Overlay {
 		final WorldPoint fountainWorldPoint = hydra.getPhase().getFountainWorldPoint();
 
 		if (fountainWorldPoint != null) {
-			final Collection<WorldPoint> fountainWorldPoints = WorldPoint.toLocalInstance(client, fountainWorldPoint);
+			final Collection<WorldPoint> fountainWorldPoints = WorldPoint.toLocalInstance(client.getTopLevelWorldView(), fountainWorldPoint);
 
 			if (fountainWorldPoints.size() == 1) {
 				WorldPoint worldPoint = null;
@@ -155,7 +166,7 @@ public class SceneOverlay extends Overlay {
 					worldPoint = wp;
 				}
 
-				final LocalPoint localPoint = LocalPoint.fromWorld(client, worldPoint);
+				final LocalPoint localPoint = LocalPoint.fromWorld(client.getTopLevelWorldView(), worldPoint);
 
 				if (localPoint != null) {
 					final Polygon polygon = getCanvasTileAreaPoly(client, localPoint, 3);
@@ -178,6 +189,10 @@ public class SceneOverlay extends Overlay {
 		modelOutlineRenderer.drawOutline(npc, HYDRA_HULL_OUTLINE_STROKE_SIZE, hydra.getPhase().getPhaseColor(), 0);
 	}
 
+	/**
+	 * Renders an outline around the fountains which weaken or strengthen hydra.
+	 * @param graphics2D
+	 */
 	private void renderFountainOutline(final Graphics2D graphics2D) {
 		final NPC npc = hydra.getNpc();
 		final WorldPoint fountainWorldPoint = hydra.getPhase().getFountainWorldPoint();
@@ -186,7 +201,7 @@ public class SceneOverlay extends Overlay {
 			return;
 		}
 
-		final Collection<WorldPoint> fountainWorldPoints = WorldPoint.toLocalInstance(client, fountainWorldPoint);
+		final Collection<WorldPoint> fountainWorldPoints = WorldPoint.toLocalInstance(client.getTopLevelWorldView(), fountainWorldPoint);
 
 		if (fountainWorldPoints.size() != 1) {
 			return;
@@ -198,7 +213,7 @@ public class SceneOverlay extends Overlay {
 			worldPoint = wp;
 		}
 
-		final LocalPoint localPoint = LocalPoint.fromWorld(client, worldPoint);
+		final LocalPoint localPoint = LocalPoint.fromWorld(client.getTopLevelWorldView(), worldPoint);
 
 		if (localPoint == null) {
 			return;
@@ -219,14 +234,18 @@ public class SceneOverlay extends Overlay {
 		drawOutlineAndFill(graphics2D, color, new Color(color.getRed(), color.getGreen(), color.getBlue(), 30), 1, polygon);
 	}
 
+	/**
+	 * Renders text on the canvas indicating the number of ticks remaining until the fountain will spurt next.
+	 * @param graphics2D
+	 */
 	private void renderFountainTicks(final Graphics2D graphics2D) {
 		if (!config.fountainTicks()) {
 			return;
 		}
 
-		final Collection<WorldPoint> fountainWorldPoints = WorldPoint.toLocalInstance(client, HydraPhase.POISON.getFountainWorldPoint());
-		fountainWorldPoints.addAll(WorldPoint.toLocalInstance(client, HydraPhase.LIGHTNING.getFountainWorldPoint()));
-		fountainWorldPoints.addAll(WorldPoint.toLocalInstance(client, HydraPhase.FLAME.getFountainWorldPoint()));
+		final Collection<WorldPoint> fountainWorldPoints = WorldPoint.toLocalInstance(client.getTopLevelWorldView(), HydraPhase.POISON.getFountainWorldPoint());
+		fountainWorldPoints.addAll(WorldPoint.toLocalInstance(client.getTopLevelWorldView(), HydraPhase.LIGHTNING.getFountainWorldPoint()));
+		fountainWorldPoints.addAll(WorldPoint.toLocalInstance(client.getTopLevelWorldView(), HydraPhase.FLAME.getFountainWorldPoint()));
 
 		if (fountainWorldPoints.isEmpty()) {
 			return;
@@ -236,7 +255,7 @@ public class SceneOverlay extends Overlay {
 
 		for (final WorldPoint wp : fountainWorldPoints) {
 			worldPoint = wp;
-			final LocalPoint localPoint = LocalPoint.fromWorld(client, worldPoint);
+			final LocalPoint localPoint = LocalPoint.fromWorld(client.getTopLevelWorldView(), worldPoint);
 
 			if (localPoint == null)
 			{
@@ -263,6 +282,10 @@ public class SceneOverlay extends Overlay {
 
 	}
 
+	/**
+	 * Renders text on the hydra which indicates the amount of HP remaining until it changes phases.
+	 * @param graphics2D
+	 */
 	private void renderHpUntilPhaseChange(final Graphics2D graphics2D) {
 		final NPC npc = hydra.getNpc();
 

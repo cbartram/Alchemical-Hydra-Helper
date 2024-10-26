@@ -61,16 +61,16 @@ public class AlchemicalHydraPlugin extends Plugin
 	@Getter
 	private Hydra hydra;
 
-	public static final int HYDRA_1_1 = 8237;
-	public static final int HYDRA_1_2 = 8238;
+	public static final int HYDRA_1_1 = 8232;
+	public static final int HYDRA_1_2 = 8233;
 	public static final int HYDRA_LIGHTNING = 8241;
-	public static final int HYDRA_2_1 = 8244;
-	public static final int HYDRA_2_2 = 8245;
+	public static final int HYDRA_2_1 = 8239;
+	public static final int HYDRA_2_2 = 8240;
 	public static final int HYDRA_FIRE = 8248;
-	public static final int HYDRA_3_1 = 8251;
-	public static final int HYDRA_3_2 = 8252;
-	public static final int HYDRA_4_1 = 8257;
-	public static final int HYDRA_4_2 = 8258;
+	public static final int HYDRA_3_1 = 8247;
+	public static final int HYDRA_3_2 = 8246;
+	public static final int HYDRA_4_1 = 8254;
+	public static final int HYDRA_4_2 = 8253; // TODO could be wrong but shouldn't matter as hydra doesn't move in enrage
 
 	@Getter
 	int fountainTicks = -1;
@@ -177,30 +177,32 @@ public class AlchemicalHydraPlugin extends Plugin
 		updateVentTicks();
 		if(hydra != null) {
 
-			// If the player is in combat with the hydra
-			if(hydra.getHpUntilPhaseChange() == 270) {
-				inCombat = true;
-			}
+			NPC npc = hydra.getNpc();
+			if(npc != null) {
+				int poseAnim = npc.getPoseAnimation();
 
-			// TODO This isn't a foolproof way of detecting phase changes. I've seen hydra have 2 hp left and change phases
-			// and the game state won't update until the player does > 2 damage. Probably something to do with the HP calculations
-			if (inCombat && hydra.getHpUntilPhaseChange() == 0) {
-				HydraPhase phase = hydra.getPhase();
-				switch (phase) {
+				// If the phase is POISON and we see either of pose anims for lightning swap phases
+				switch(hydra.getPhase()) {
 					case POISON:
-						System.out.println("Changing phase to: LIGHTNING.");
-						hydra.changePhase(HydraPhase.LIGHTNING);
+						if(poseAnim == HydraPhase.LIGHTNING.getPoseAnimationIdle() || poseAnim == HydraPhase.LIGHTNING.getPoseAnimationMoving()) {
+							System.out.println("Changing phase to: LIGHTNING.");
+							hydra.changePhase(HydraPhase.LIGHTNING);
+						}
 						break;
 					case LIGHTNING:
-						System.out.println("Changing phase to: FLAME.");
-						hydra.changePhase(HydraPhase.FLAME);
+						if(poseAnim == HydraPhase.FLAME.getPoseAnimationIdle() || poseAnim == HydraPhase.FLAME.getPoseAnimationMoving()) {
+							System.out.println("Changing phase to: FLAME.");
+							hydra.changePhase(HydraPhase.FLAME);
+						}
 						break;
 					case FLAME:
-						System.out.println("Changing phase to: ENRAGE.");
-						hydra.changePhase(HydraPhase.ENRAGED);
+						if(poseAnim == HydraPhase.ENRAGED.getPoseAnimationIdle() || poseAnim == HydraPhase.ENRAGED.getPoseAnimationMoving()) {
+							System.out.println("Changing phase to: ENRAGE.");
+							hydra.changePhase(HydraPhase.ENRAGED);
+						}
 						break;
 					case ENRAGED:
-						hydra = null;
+//						hydra = null;
 						if (!poisonProjectiles.isEmpty()) {
 							poisonProjectiles.clear();
 						}
@@ -213,7 +215,6 @@ public class AlchemicalHydraPlugin extends Plugin
 			}
 		}
 	}
-
 
 	/**
 	 * Updates the ticks remaining until the fountain spurts water again weakening the Alchemical Hydra.
@@ -246,7 +247,6 @@ public class AlchemicalHydraPlugin extends Plugin
 		final NPC npc = event.getNpc();
 
 		if (npc.getId() == NpcID.ALCHEMICAL_HYDRA) {
-			System.out.println("A new hydra has spawned.");
 			hydra = new Hydra(npc);
 			if (client.isInInstancedRegion() && fountainTicks == -1) {
 				fountainTicks = 11;
@@ -259,9 +259,7 @@ public class AlchemicalHydraPlugin extends Plugin
 		final NPC npc = event.getNpc();
 
 		if(npc != null) {
-			System.out.println("NPC Despawn event detected for: " + npc.getName());
 			if (Objects.equals(npc.getName(), "Alchemical Hydra")) {
-				System.out.println("Alchemical hydra has been killed. Re-setting plugin state.");
 				hydra = null;
 				poisonProjectiles.clear();
 				lastAttackTick = -1;
